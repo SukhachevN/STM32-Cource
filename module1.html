@@ -5,11 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <script
+    <!-- <script
       type="text/javascript"
       async
       src="/MathJax/MathJax.js?config=TeX-MML-AM_CHTML"
-    ></script>
+    ></script> -->
     <title>Методические указания.</title>
   </head>
   <body>
@@ -306,9 +306,7 @@
             <pre>
                 uint8_t var[] = {"Hello World!"};
                 HAL_UART_Transmit(&huart1, &var[0], 12, 100);
-              </pre
-            >
-
+            </pre>
             <div class="imageBlock">
               <img src="./images/module_1/STM32-create-project-step-9.png" />
               <p>Рисунок 12 Написание кода</p>
@@ -562,7 +560,8 @@
           A, B, C, D, E – рациональные десятичные числа от -20 до +20.<br />A >
           B > C > 0; 0 > D > E (модуль E > модуля D)
         </p>
-        <ol class="math">
+        <img src="./images/module_1/task1-2.png" />
+        <!-- <ol class="math">
           <li><tex>$$\sqrt{C-A}*(D+E)^2\over{A+E}$$</tex></li>
           <li><tex>$$\sqrt[3]{C}+(B-A)^3\over{(D+E)^2}$$</tex></li>
           <li><tex>$$A^{2\over{3}}*(B-C)^2\over(D-E)$$</tex></li>
@@ -575,7 +574,7 @@
           <li><tex>$$tan(0.35A*B+\sqrt{C+D^2}-E$$</tex></li>
           <li><tex>$$(log_C {(A+B)}-\sqrt{E^2+D})^2$$</tex></li>
           <li><tex>$$sin(\sqrt{C-A}*B)\over{(D+E)^2}$$</tex></li>
-        </ol>
+        </ol> -->
         <p>Полезными будут следующие функции библиотеки Math</p>
         <pre>
           sqrt(a) - возвращает квадратный корень числа a
@@ -587,7 +586,8 @@
           Чтобы вывести логарифм с определённым основание воспользуемся формулой
           замены основания логарифма
         </p>
-        <tex>$$log_A B = {log_C B\over{log_C A}}$$</tex>
+        <img src="./images/module_1/task1-2-1.png" />
+        <!-- <tex>$$log_A B = {log_C B\over{log_C A}}$$</tex> -->
         <p>
           Напишем простую функцию для получения логарифма с нужным основанием
         </p>
@@ -604,8 +604,10 @@
         <p>
           Рассмотрим пример. Пусть A = -10.43, B = -2.00325, C = 7.032, D =
           11.999, E = 17.124 <br />
-          Рассчитаем выражение <tex>$${log_B C + \sqrt[3]{D+A}}\over{-E}$$</tex>
+          Рассчитаем выражение:
+          <!-- <tex>$${log_B C + \sqrt[3]{D+A}}\over{-E}$$</tex> -->
         </p>
+        <img src="./images/module_1/task1-2-2.png" />
         <pre>
         char buffer[100];
         float A = 10.43;
@@ -621,11 +623,12 @@
           <p>Рисунок 30 Результаты расчёта математического выражения</p>
         </div>
         <p>Выполним проверку</p>
-        <tex
+        <img src="./images/module_1/task1-2-3.png" />
+        <!-- <tex
           >$$log_B C = 2.807359 , D+A = -1.569, -E = 17.124 , log_B C +
           \sqrt[3]{D+A} = -1.162004, {{log_B C + \sqrt[3]{D+A}}\over{-E}} =
           0.09608 $$</tex
-        >
+        > -->
         <p>Результат очень близок, разница из-за погрешности вычислений</p>
       </section>
       <section id="module1-3">
@@ -673,7 +676,8 @@
             (ИЛИ-НЕ)
           </li>
         </ul>
-        <ol class="math">
+        <img src="./images/module_1/task1-3-0.png" />
+        <!-- <ol class="math">
           <li><tex>$$(A + \bar{B}) + (\bar C \oplus D)$$</tex></li>
           <li><tex>$$\overline{A*\bar C} \oplus (B + \bar D) $$</tex></li>
           <li><tex>$$\overline{(A+D)}*(B \oplus \bar C)$$</tex></li>
@@ -686,7 +690,7 @@
           <li><tex>$$(C+D)|(A \oplus \bar B)$$</tex></li>
           <li><tex>$$A*B*(C+D)↓ \bar D$$</tex></li>
           <li><tex>$$\bar A \equiv \overline{(B+\bar C + D)}$$</tex></li>
-        </ol>
+        </ol> -->
         <p>
           Ниже приведены логические операторы, с помощью которых можно
           реализовать операции
@@ -712,8 +716,10 @@
         </pre>
         <p>
           Рассмотрим пример. A = 0b1010; B = 0b1011; C = 0b1100; D = 0b1101,
-          реализуем выражение $$\bar A*(D↓C)+(C|B)$$
+          реализуем выражение:
+          <!-- $$\bar A*(D↓C)+(C|B)$$ -->
         </p>
+        <img src="./images/module_1/task1-3-1.png" />
         <pre>
           char buffer[100];
           int A = 0b1010;
@@ -727,10 +733,11 @@
           <p>Рисунок 31 Результаты расчёта логического выражения</p>
         </div>
         <p>Выполним проверку</p>
-        <tex
+        <img src="./images/module_1/task1-3-2.png" />
+        <!-- <tex
           >$$\bar A = 0b0101, (D↓C) = 0b0011, \bar A*(D↓C) = 0b0001, (C|B) =
           0b0000, \bar A*(D↓C)+(C|B) = 0b0001 $$</tex
-        >
+        > -->
         <p>
           Как видим полученный результат идентичен результату который посчитан
           на микроконтроллере
@@ -805,13 +812,15 @@
           >
         </p>
         <p>Формула Бине:</p>
-        <p>
+        <img src="./images/module_1/task1-4-1.png" />
+        <!-- <p>
           $$F_{n} = {{{(1+\sqrt{5})^n\over{2}} -
           {(1-\sqrt{5})^n\over{2}}}\over{\sqrt{5}}}$$
-        </p>
+        </p> -->
         <p>Линейный алгоритм</p>
-        <p>$$F_{n} = F_{n-1} + F_{n-2}$$</p>
-        <p>$$F_{0} = 0, F_{1} = 1$$</p>
+        <img src="./images/module_1/task1-4-2.png" />
+        <!-- <p>$$F_{n} = F_{n-1} + F_{n-2}$$</p>
+        <p>$$F_{0} = 0, F_{1} = 1$$</p> -->
         <p>Функцию для вычисления числа Фибоначчи реализовать самостоятельно</p>
         <p>
           Возможно при решении данной задачи, может быть непонятно почему ответ
