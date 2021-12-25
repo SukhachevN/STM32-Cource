@@ -1,0 +1,62 @@
+@font-face {
+  font-family: 'Ubuntu', sans-serif;
+  src: url(/fonts/Ubuntu-M.ttf);
+}
+
+body {
+  font-family: 'Ubuntu', sans-serif;
+  min-width: 480px;
+}
+
+section {
+  padding-bottom: 50px;
+}
+
+.container {
+  padding: 50px;
+  height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+img {
+  margin: auto;
+  max-width: 1024px;
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  img {
+    width: 100%;
+  }
+}
+
+.imageBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem 0;
+
+  p {
+    font-style: italic;
+  }
+}
+
+.math {
+  li {
+    font-style: italic;
+  }
+}
+
+.MJXc-display {
+  text-align: start !important;
+}
+
+.mjx-chtml.MathJax_CHTML {
+  font-size: 100% !important;
+  text-align: start !important;
+}
