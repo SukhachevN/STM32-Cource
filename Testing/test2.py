@@ -40,3 +40,16 @@ if task == '2.1':
             print(colored(f'Число {i+1} - верно', 'green'))
     print(colored('Тест пройден', 'green'))
     exit(0)
+elif task == '2.2':
+    lines = input("Введите количество задействованных строк:")
+    print("Запустите симуляцию в Proteus")
+    for i in range(int(lines)):
+        line = input(f"Введите строку {i+1}:")
+        data = ser.read(size=len(line)).decode('utf-8')
+        if data != line:
+            print(colored(f'Тест провален, ожидалось - "{line}", получено - "{data}"', 'red'))
+            exit(-1)
+        else:
+            print(colored(f'Строка {i + 1} - верно', 'green'))
+    print(colored('Тест пройден', 'green'))
+    exit(0)
