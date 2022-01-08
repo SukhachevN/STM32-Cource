@@ -10,8 +10,8 @@
 #define SRC_LCD2004_H_
 
 void LCD_init(void);
-void LCD_print(char[], UART_HandleTypeDef);
-void LCD_ASCII(int, UART_HandleTypeDef);
+void LCD_print(char[]);
+void LCD_ASCII(int);
 void LCD_set_cursor(int, int);
 void LCD(uint8_t, uint8_t);
 void LCD_init_port(char[],char[], int);

@@ -53,3 +53,37 @@ elif task == '2.2':
             print(colored(f'Строка {i + 1} - верно', 'green'))
     print(colored('Тест пройден', 'green'))
     exit(0)
+elif task == '2.3':
+    answer = input('Введите ожидаемую последовательность символов: ')
+    data = ser.read(size=(len("LAST PRESSED KEY - "))).decode('utf-8')
+    if data == "LAST PRESSED KEY - ":
+        for i in range(0, len(answer)):
+            answerASCII = str(ord(answer[i]))
+            data = ser.read(size=(len(answerASCII))).decode('utf-8')
+            if data != answerASCII:
+                print(colored(f'Тест провален, ожидалось - "{answerASCII}", получено - "{data}"', 'red'))
+                exit(-1)
+            else:
+                print(colored(f'Символ {i+1} - верно', 'green'))
+
+        print(colored('Тест пройден', 'green'))
+        exit(0)
+    else:
+        print(colored(f'Тест провален, не удалось получить сообщение "LAST PRESSED KEY - "', 'red'))
+        exit(-1)
+elif task == '2.4':
+    math = input('Введите математическое выражение:')
+    expect = input('Введите ожидаемый ответ:')
+    mathAnswer = ser.read(size=(len(math))).decode('utf-8')
+    answer = ser.read(size=(len(expect))).decode('utf-8')
+    if math == mathAnswer:
+        print(colored('Выражение записано верно', 'green'))
+        if expect == answer:
+            print(colored('Тест пройден', 'green'))
+            exit(0)
+        else:
+            print(colored(f'Тест провален, ожидалось - "{expect}", получено - "{answer}"', 'red'))
+            exit(-1)
+    else:
+        print(colored(f'Тест провален, ожидаемое выражение не совпало, ожидалось {math} получено - "{mathAnswer}"', 'red'))
+        exit(-1)
