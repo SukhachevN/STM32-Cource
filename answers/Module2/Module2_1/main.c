@@ -94,13 +94,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t answer[35] = {0,1,1,0,0,0,0,1,1,0,1,1,0,1,1,1,1,1,0,0,1,0,1,1,0,0,1,1,1,0,1,1,0,1,1};
+  uint8_t answer[35] = {0,1,1,0,0,0,0,1,1,0,1,1,0,1,1,1,1,1,0,0,1,0,1,1,0,0,1,1,1,0,1,1,0,1,1}; // массив значений
   int i = 0;
   while (1)
   {
     /* USER CODE END WHILE */
 	  if (i < 35) {
-		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_0,answer[i]);
+		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_0,answer[i]); // подача значения на порт
 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_1,answer[i+1]);
 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,answer[i+2]);
 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_3,answer[i+3]);
@@ -108,9 +108,9 @@ int main(void)
 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_5,answer[i+5]);
 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,answer[i+6]);
 		  char buffer[100];
-//		  HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sprintf(buffer, "%d%d%d%d%d%d%d", answer[i], answer[i+1],
+//		  HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sprintf(buffer, "%d%d%d%d%d%d%d", answer[i], answer[i+1], // вывод тестирования для типа DIGITAL
 //				  answer[i+2], answer[i+3], answer[i+4], answer[i+5], answer[i+6]), 100);
-		  HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sprintf(buffer, "%d%d%d%d", answer[i], answer[i+4],
+		  HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sprintf(buffer, "%d%d%d%d", answer[i], answer[i+4], // вывод тестирования для типа BCD
 				  answer[i+5], answer[i+6]), 100);
 		  i+=7;
 		  HAL_Delay(1000);

@@ -70,13 +70,13 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	int currentKey;
 		int readKey;
-		void setVCC() {
+		void setVCC() { // функция для подачи 1 на порты
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 1);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 1);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 1);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 1);
 		}
-		int readRow() {
+		int readRow() { // функция для чтения строки
 			if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == 0) {
 				return 0;
 			} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0) {
@@ -112,7 +112,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-  LCD_init_port("D0","E",0);
+  LCD_init_port("D0","E",0); // настройка подключения портов ЖКИ
    LCD_init_port("D1","E",1);
    LCD_init_port("D2","E",2);
    LCD_init_port("D3","E",3);
@@ -125,23 +125,23 @@ int main(void)
    LCD_init();
    LCD_set_cursor(0,0);
    currentKey = -1;
-   double numbers[2];
+   double numbers[2]; // переменная для хранения операндов
    numbers[0] = 0;
    numbers[1] = 0;
-   char operation = '0';
-   int k = 0;
+   char operation = '0'; // переменная для хранения текущей операции
+   int k = 0; // переменная для указания номера операнда
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-   char buffer[100];
-  int needClean = 0;
-  int isError = 0;
+  char buffer[100]; // буффер для хранения числа пока вводим цифры
+  int needClean = 0; // переменная определяющая нужно ли очистить экран
+  int isError = 0; // переменная хранения индикатора ошибки
   while (1)
   {
     /* USER CODE END WHILE */
 	  int i;
-	  	  for (i = 0; i < 4; i++) {
-	  		  setVCC();
-	  		  switch (i){
+	  	  for (i = 0; i < 4; i++) { // в цикле опрашиваем столбцы
+	  		  setVCC(); // подаём 1 на порты столбцов
+	  		  switch (i) { // теперь поочерёдно подаём 0 на каждый столбец
 	  		  	case 0:
 	  		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 0);
 	  		  	 break;
@@ -155,18 +155,18 @@ int main(void)
 	  		  	 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 0);
 	  		  	break;
 	  		  }
-	  		  readKey = readRow();
-	  		  if (readKey != -1) {
-	  			  currentKey = readKey*4+i;
-	  			  if (needClean == 1) {
+	  		  readKey = readRow(); // определяем нажатую клавишу
+	  		  if (readKey != -1) { // если было нажатие
+	  			  currentKey = readKey*4+i; // вычисляем номер нажатой клавиши
+	  			  if (needClean == 1) { // если надо, то чистим экран
 	  				LCD_init();
 	  				LCD_set_cursor(0,0);
 	  				needClean = 0;
 	  			  }
-	  			switch (currentKey) {
+	  			switch (currentKey) { // в зависимости от номера клавиши по разному обрабатываем
 	  				case 0:
-	  					LCD_print("7",huart1);
-	  					strcat(buffer, "7");
+	  					LCD_print("7",huart1); // выводим на ЖКИ
+	  					strcat(buffer, "7"); // записываем число в буффер, чтобы потом из цифр собрать число
 	  				 break;
 	  				case 1:
 	  					LCD_print("8",huart1);
@@ -178,14 +178,14 @@ int main(void)
 	  				 break;
 	  				 case 3:
 	  					LCD_print("/",huart1);
-	  					numbers[k]=atoi(buffer);
-	  					if (operation == '0') {
+	  					numbers[k]=atoi(buffer); // если встретили кнопку с операцией, то записываем первое число
+	  					if (operation == '0') { // и записываем операцию
 	  						operation='/';
-	  					} else {
+	  					} else { // если два знака операции подряд, то значит ошибка
 	  						isError = 1;
 	  					}
-	  					k++;
-	  					memset(buffer, 0, 100);
+	  					k++; // переводим указатель операнда на следующий
+	  					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
 	  				 break;
 	  				 case 4:
 	  					LCD_print("4",huart1);
@@ -233,7 +233,7 @@ int main(void)
 	  					k++;
 	  					memset(buffer, 0, 100);
 	  				  break;
-	  				  case 12:
+	  				  case 12: // кнопка сброса
 	  					LCD_init();
 	  					LCD_set_cursor(0,0);
 	  					memset(buffer, 0, 100);
@@ -245,13 +245,13 @@ int main(void)
 	  					LCD_print("0",huart1);
 	  					strcat(buffer, "0");
 	  				  break;
-	  				  case 14:
+	  				  case 14: // кнопка "="
 	  					LCD_init();
 	  					LCD_set_cursor(0,0);
-	  					numbers[k]=atoi(buffer);
-	  					memset(buffer, 0, 100);
+	  					numbers[k]=atoi(buffer); // переводим и строки в число второй операнд
+	  					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
 	  					double answer = 0.0;
-	  					switch (operation) {
+	  					switch (operation) { // в зависиости от знака операции производим вычисления
 	  						case '/':
 	  							if (numbers[1] != 0) {
 	  								answer = numbers[0]/numbers[1];
@@ -277,10 +277,14 @@ int main(void)
 	  						LCD_print("ERROR", huart1);
 	  						isError = 0;
 	  					} else {
-	  						sprintf(buf, "%.2f", answer);
+	  						if (operation == '/') { // если было деление, то выводим дробную часть
+	  							sprintf(buf, "%.2f", answer);
+	  						} else {
+	  							sprintf(buf, "%.0f", answer);
+	  						}
 	  						LCD_print(buf, huart1);
 	  					}
-	  					numbers[0] = 0;
+	  					numbers[0] = 0; // сброс всех значений
 	  					numbers[1] = 0;
 	  					k = 0;
 	  					needClean = 1;
