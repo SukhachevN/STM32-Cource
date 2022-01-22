@@ -89,7 +89,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  LCD_init_port("D0","D",0);
+  LCD_init_port("D0","D",0); // назначаем выводы
   LCD_init_port("D1","D",1);
   LCD_init_port("D2","D",2);
   LCD_init_port("D3","D",3);

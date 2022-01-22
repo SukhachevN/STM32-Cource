@@ -70,12 +70,12 @@ int main(void)
 	int currentKey;
 	int lastKey;
 	int readKey;
-	void setVCC() {
+	void setVCC() { // функция подачи 1 на столбцы
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 1);
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 1);
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 1);
 	}
-	int readRow() {
+	int readRow() { // функция чтения строк
 		if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == 0) {
 			return 0;
 		} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0) {
@@ -110,7 +110,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  LCD_init_port("D0","E",0);
+  LCD_init_port("D0","E",0); // назначение портов для ЖКИ
   LCD_init_port("D1","E",1);
   LCD_init_port("D2","E",2);
   LCD_init_port("D3","E",3);
@@ -133,9 +133,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
 	  int i;
-	  for (i = 0; i < 3; i++) {
-		  setVCC();
-		  switch (i){
+	  for (i = 0; i < 3; i++) { // в цикле опрашиваем каждый столбец
+		  setVCC(); // подаём 1 на все столбцы
+		  switch (i){ // поочерёдно подаём 0 на каждый столбец
 		  	case 0:
 		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 0);
 		  	 break;
@@ -146,14 +146,14 @@ int main(void)
 		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 0);
 		  	break;
 		  }
-		  readKey = readRow();
+		  readKey = readRow(); // читаем нажатую кнопку
 		  if (readKey != -1) {
-			  currentKey = readKey*3+i;
+			  currentKey = readKey*3+i; // определяем номер клавиши
 		  }
 	  }
 	  if (currentKey != lastKey) {
 		  LCD_set_cursor(19,0);
-		  switch (currentKey) {
+		  switch (currentKey) { // в зависимости от номера клавиши отправляем разный ASCII код
 		  	case 0:
 		  		LCD_ASCII(49, huart1);
 		  	break;
