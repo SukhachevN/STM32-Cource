@@ -73,7 +73,9 @@ elif task == '2.3':
         exit(-1)
 elif task == '2.4':
     math = input('Введите математическое выражение:')
-    expect = input('Введите ожидаемый ответ:')
+    expect = eval(math)
+    expectError = input('Ожидается ошибка(Да/пропустить):')
+    expect = "ERROR" if expectError else str(expect)
     mathAnswer = ser.read(size=(len(math))).decode('utf-8')
     answer = ser.read(size=(len(expect))).decode('utf-8')
     if math == mathAnswer:
