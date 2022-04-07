@@ -124,7 +124,6 @@ void LCD_init(void) {
 }
 
 void LCD_print(char msg[]){
-	HAL_UART_Transmit(&uart, (uint8_t*)msg, strlen(msg), 100);
 	for (uint8_t i = 0; i < strlen(msg); i++) {
 		  LCD((msg[i]),1);
 		  HAL_Delay(1);
@@ -132,8 +131,6 @@ void LCD_print(char msg[]){
 }
 
 void LCD_ASCII(int code) {
-	char buffer[3];
-	HAL_UART_Transmit(&uart, buffer,  sprintf(buffer, "%d", code), 100);
 	LCD(code,1);
 }
 
