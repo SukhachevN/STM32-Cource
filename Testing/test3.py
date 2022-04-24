@@ -30,16 +30,17 @@ if task == '3.1':
             print(colored(f'Частота - ошибка, ожидалось {expFreq}, получено {realFreq}', 'red'))
     else:
         print(colored(f'Скважность - ошибка, ожидалось {expPwm}, получено {realPwm}', 'red'))
-elif task == '3.2':
+elif task == '3.2' or task == '3.4':
     expected = input('Введите через запятую(без пробелов) ожидаемую последовательность значений:')
     expected = expected.split(',')
     error = False
+    errMsg = 'Частота' if task == '3.2' else 'Угол'
     for i in range(0, len(expected)):
         temp = int((ser.read(5).decode('utf-8').replace('\n\r', '')))
         if int(expected[i]) == int(temp):
             print(colored(f'Значение {i+1} - верно', 'green'))
         else:
-            print(colored(f'Частота - ошибка, ожидалось {expected[i]}, получено {temp}', 'red'))
+            print(colored(f'{errMsg} - ошибка, ожидалось {expected[i]}, получено {temp}', 'red'))
             error = True
     if not error:
         print(colored('Тест пройден', 'green'))
