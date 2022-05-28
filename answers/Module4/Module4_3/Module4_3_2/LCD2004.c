@@ -1,5 +1,5 @@
 #include "main.h"
-#include "LCD.h"
+#include "LCD2004.h"
 #include "string.h"
 #include "stm32f4xx_hal.h"
 #include "stdio.h"
@@ -123,14 +123,17 @@ void LCD_init(void) {
 	LCD(0x80, 0);
 }
 
-void LCD_print(char msg[]){
+void LCD_print(char msg[], UART_HandleTypeDef uart){
+	HAL_UART_Transmit(&uart, (uint8_t*)msg, strlen(msg), 100);
 	for (uint8_t i = 0; i < strlen(msg); i++) {
 		  LCD((msg[i]),1);
 		  HAL_Delay(1);
 	  }
 }
 
-void LCD_ASCII(int code) {
+void LCD_ASCII(int code, UART_HandleTypeDef uart) {
+	char buffer[3];
+	HAL_UART_Transmit(&uart, buffer,  sprintf(buffer, "%d", code), 100);
 	LCD(code,1);
 }
 
