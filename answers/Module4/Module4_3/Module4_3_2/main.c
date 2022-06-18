@@ -19,6 +19,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "LCD2004.h"
+#include "stdio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -105,7 +107,7 @@ int main(void) {
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	HAL_UART_Receive(&huart1, buffer, 1, 100); // очистка UART перед началом работы
+	HAL_UART_Receive(&huart1, (uint8_t*) buffer, 1, 100); // очистка UART перед началом работы
 	char minus = *"-"; // переменные для знаков
 	char plus = *"+";
 	char div = *"/";
@@ -119,7 +121,7 @@ int main(void) {
 	char resultBuffer[100];
 	char sign; // переменная для хранения знака
 	while (1) {
-		HAL_UART_Receive(&huart1, buffer, 1, HAL_MAX_DELAY); // получение числа, максимальная задержка, чтобы "зависнуть пока не придёт число"
+		HAL_UART_Receive(&huart1, (uint8_t*) buffer, 1, HAL_MAX_DELAY); // получение числа, максимальная задержка, чтобы "зависнуть пока не придёт число"
 		high = GPIOC->IDR; // получение старших бит
 		low = GPIOA->IDR; // получение младших бит
 		if (isResultSet == 1) { // проверка, записали ли первый операнд

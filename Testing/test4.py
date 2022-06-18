@@ -10,9 +10,9 @@ def test(answer, data, successMsg='Тест пройден'):
     if data == answer:
         print(colored(successMsg, 'green'))
     else:
-        print(colored(f'Тест провален, ожидалось - "{answer}", получено - "{data}"', 'red'))
+        print(colored(f'Тест не пройден, ожидалось - "{answer}", получено - "{data}"', 'red'))
         exit(-1)
-
+# 
 
 if task == '4.1':
     initNumber = input('Введите начальное число: ')

@@ -69,11 +69,11 @@ elif task == '2.3':
         print(colored('Тест пройден', 'green'))
         exit(0)
     else:
-        print(colored(f'Тест провален, не удалось получить сообщение "LAST PRESSED KEY - "', 'red'))
+        print(colored(f'Тест не пройден, не удалось получить сообщение "LAST PRESSED KEY - "', 'red'))
         exit(-1)
 elif task == '2.4':
     math = input('Введите математическое выражение:')
-    expect = eval(math)
+    expect = eval(math.replace('x','*'))
     expectError = input('Ожидается ошибка(Да/пропустить):')
     expect = "ERROR" if expectError else str(expect)
     mathAnswer = ser.read(size=(len(math))).decode('utf-8')
@@ -87,5 +87,5 @@ elif task == '2.4':
             print(colored(f'Тест провален, ожидалось - "{expect}", получено - "{answer}"', 'red'))
             exit(-1)
     else:
-        print(colored(f'Тест провален, ожидаемое выражение не совпало, ожидалось {math} получено - "{mathAnswer}"', 'red'))
+        print(colored(f'Тест не пройден, ожидаемое выражение не совпало, ожидалось {math} получено - "{mathAnswer}"', 'red'))
         exit(-1)
