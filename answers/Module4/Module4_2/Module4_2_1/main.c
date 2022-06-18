@@ -19,6 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "LCD.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -106,7 +110,7 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
-	LCD_init_port("D0", "E", 0); // назначение портов для ЖК�?
+	LCD_init_port("D0", "E", 0); // назначение портов для ЖКИ
 	LCD_init_port("D1", "E", 1);
 	LCD_init_port("D2", "E", 2);
 	LCD_init_port("D3", "E", 3);
@@ -118,10 +122,9 @@ int main(void) {
 	LCD_init_port("E", "E", 9);
 	LCD_init();
 	LCD_set_cursor(0, 0);
-	char buffer[100];
-	char accum[3] = { };
-	int currentPos = 0;
-	int wasPressed = 0;
+	char accum[3] = { }; // буфер хранения введенного числа
+	int currentPos = 0; // позиция текущей цифры
+	int wasPressed = 0; // флаг была ли нажата кнопка
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -150,9 +153,10 @@ int main(void) {
 				wasPressed = 1;
 			}
 		}
-		if (wasPressed == 1) {
-			int isOperation = 0;
-			int number = -1;
+		if (wasPressed == 1) { // если была нажата кнопка
+			int isOperation = 0; // флаг была ли кнопка операцией
+			int number = -1; // переменная хранения значения нажатой кнопки
+			// преобразовать номер нажатой кнопки в цифру соответствующую этой кнопке
 			switch (currentKey) {
 			case 0:
 			case 1:
@@ -169,60 +173,60 @@ int main(void) {
 			case 10:
 				number = currentKey - 7;
 				break;
-			case 11:
+			case 11: // нажата кнопка минус
 				if (atoi(accum) > 0) {
-					sprintf(accum, "-%d", atoi(accum));
-					if (strlen(accum) != 3) {
+					sprintf(accum, "-%d", atoi(accum)); // записать текущее число со знаком минус
+					if (strlen(accum) != 3) { // сдвинуть счётчик позиции текцщей цифры
 						currentPos = strlen(accum);
 					} else {
 						currentPos = 2;
 					}
 				}
 				break;
-			case 12:
+			case 12: // стереть последний символ
 				accum[currentPos] = *"";
 				if (currentPos != 0) {
-					currentPos--;
+					currentPos--; // сдвинуть позицию текущей цифры
 				}
 				LCD_init();
-				LCD_print(accum);
-				isOperation = 1;
+				LCD_print(accum); // вывести на ЖКИ
+				isOperation = 1; // установить флаг операции
 				wasPressed = 0;
 				break;
 			case 13:
 				number = 0;
 				break;
 			case 14:
-				HAL_UART_Transmit(&huart1, accum, 3, 100);
-				isOperation = 1;
+				HAL_UART_Transmit(&huart1, (uint8_t*) accum, 3, 100); // отправить число по УАРТ
+				isOperation = 1; // установить флаг операции
 				wasPressed = 0;
-				memset(accum, 0, 3);
+				memset(accum, 0, 3); // очистить буфер
 				currentPos = 0;
 				LCD_init();
 				HAL_Delay(200);
 				break;
-			case 15:
-				if (atoi(accum) < 0) {
+			case 15: // если кнопка плюс
+				if (atoi(accum) < 0) { // сделать число положительным
 					sprintf(accum, "%d", -atoi(accum));
 					if (strlen(accum) != 3) {
-						currentPos = strlen(accum);
+						currentPos = strlen(accum); // сдвинуть позицию текущей цифры
 					} else {
 						currentPos = 2;
 					}
 				}
 				break;
 			}
-			if (isOperation == 0) {
+			if (isOperation == 0) { // если не операция
 				if (number != -1) {
 					char digit[1];
 					sprintf(digit, "%d", number);
-					accum[currentPos] = digit[0];
+					accum[currentPos] = digit[0]; // записать нажатую цифру в буфер
 					if (currentPos != 2) {
 						currentPos++;
 					}
 				}
 				LCD_init();
-				LCD_print(&accum[0]);
+				LCD_print(&accum[0]); // вывести на ЖКИ
 				wasPressed = 0;
 			}
 			HAL_Delay(200);

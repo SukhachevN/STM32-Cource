@@ -45,7 +45,7 @@ elif task == '3.2' or task == '3.4':
     if not error:
         print(colored('Тест пройден', 'green'))
     else:
-        print(colored('Тест провален', 'red'))
+        print(colored('Тест не пройден', 'red'))
 elif task == '3.3':
         data = ''
         expPeriod = int(input('Введите период(сек): '))

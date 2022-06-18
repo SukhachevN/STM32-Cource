@@ -14,13 +14,13 @@ def test(answer, data):
         print(colored('Тест пройден', 'green'))
         exit(0)
     else:
-        print(colored(f'Тест провален, ожидалось - "{answer}", получено - "{data}"', 'red'))
+        print(colored(f'Тест не пройден, ожидалось - "{answer}", получено - "{data}"', 'red'))
         exit(-1)
 
 
 def testFib(answer, data, i):
     if data != answer:
-        print(colored(f'Тест провален, ошибка в {i}-ом числе Фибоначчи, ожидалось - "{answer}", получено - "{data}"',
+        print(colored(f'Тест не пройден, ошибка в {i}-ом числе Фибоначчи, ожидалось - "{answer}", получено - "{data}"',
                       'red'))
         exit(-1)
     elif i == 30:

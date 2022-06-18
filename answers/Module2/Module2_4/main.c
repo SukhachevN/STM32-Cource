@@ -1,25 +1,26 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "LCD2004.h"
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 /* Private includes ----------------------------------------------------------*/
@@ -62,371 +63,366 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
+	/* USER CODE BEGIN 1 */
 	int currentKey;
-		int readKey;
-		void setVCC() { // функция для подачи 1 на порты
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 1);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 1);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 1);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 1);
+	int readKey;
+	void setVCC() { // функция для подачи 1 на порты
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 1);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 1);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 1);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 1);
+	}
+	int readRow() { // функция для чтения строки
+		if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == 0) {
+			return 0;
+		} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0) {
+			return 1;
+		} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == 0) {
+			return 2;
+		} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == 0) {
+			return 3;
 		}
-		int readRow() { // функция для чтения строки
-			if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == 0) {
-				return 0;
-			} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0) {
-				return 1;
-			} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == 0) {
-				return 2;
-			} else if (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == 0) {
-				return 3;
+		return -1;
+	}
+	/* USER CODE END 1 */
+
+	/* MCU Configuration--------------------------------------------------------*/
+
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
+
+	/* USER CODE BEGIN Init */
+
+	/* USER CODE END Init */
+
+	/* Configure the system clock */
+	SystemClock_Config();
+
+	/* USER CODE BEGIN SysInit */
+
+	/* USER CODE END SysInit */
+
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_USART1_UART_Init();
+	/* USER CODE BEGIN 2 */
+	LCD_init_port("D0", "E", 0); // настройка подключения портов ЖКИ
+	LCD_init_port("D1", "E", 1);
+	LCD_init_port("D2", "E", 2);
+	LCD_init_port("D3", "E", 3);
+	LCD_init_port("D4", "E", 4);
+	LCD_init_port("D5", "E", 5);
+	LCD_init_port("D6", "E", 6);
+	LCD_init_port("D7", "E", 7);
+	LCD_init_port("RS", "E", 8);
+	LCD_init_port("E", "E", 9);
+	LCD_init();
+	LCD_set_cursor(0, 0);
+	currentKey = -1;
+	double numbers[2]; // переменная для хранения операндов
+	numbers[0] = 0;
+	numbers[1] = 0;
+	char operation = '0'; // переменная для хранения текущей операции
+	int k = 0; // переменная для указания номера операнда
+	/* USER CODE END 2 */
+
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	char buffer[100]; // буффер для хранения числа пока вводим цифры
+	int needClean = 0; // переменная определяющая нужно ли очистить экран
+	int isError = 0; // переменная хранения индикатора ошибки
+	while (1) {
+		int i;
+		for (i = 0; i < 4; i++) { // в цикле опрашиваем столбцы
+			setVCC(); // подаём 1 на порты столбцов
+			switch (i) { // теперь поочерёдно подаём 0 на каждый столбец
+			case 0:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 0);
+				break;
+			case 1:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 0);
+				break;
+			case 2:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 0);
+				break;
+			case 3:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 0);
+				break;
 			}
-			return -1;
+			readKey = readRow(); // определяем нажатую клавишу
+			if (readKey != -1) { // если было нажатие
+				currentKey = readKey * 4 + i; // вычисляем номер нажатой клавиши
+				if (needClean == 1) { // если надо, то чистим экран
+					LCD_init();
+					LCD_set_cursor(0, 0);
+					needClean = 0;
+				}
+				switch (currentKey) { // в зависимости от номера клавиши по разному обрабатываем
+				case 0:
+					LCD_print("7", huart1); // выводим на ЖКИ
+					strcat(buffer, "7"); // записываем число в буффер, чтобы потом из цифр собрать число
+					break;
+				case 1:
+					LCD_print("8", huart1);
+					strcat(buffer, "8");
+					break;
+				case 2:
+					LCD_print("9", huart1);
+					strcat(buffer, "9");
+					break;
+				case 3:
+					LCD_print("/", huart1);
+					numbers[k] = atoi(buffer); // если встретили кнопку с операцией, то записываем первое число
+					if (operation == '0') { // и записываем операцию
+						operation = '/';
+					} else { // если два знака операции подряд, то значит ошибка
+						isError = 1;
+					}
+					k++; // переводим указатель операнда на следующий
+					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
+					break;
+				case 4:
+					LCD_print("4", huart1);
+					strcat(buffer, "4");
+					break;
+				case 5:
+					LCD_print("5", huart1);
+					strcat(buffer, "5");
+					break;
+				case 6:
+					LCD_print("6", huart1);
+					strcat(buffer, "6");
+					break;
+				case 7:
+					LCD_print("x", huart1);
+					numbers[k] = atoi(buffer);
+					if (operation == '0') {
+						operation = 'x';
+					} else {
+						isError = 1;
+					}
+					k++;
+					memset(buffer, 0, 100);
+					break;
+				case 8:
+					LCD_print("1", huart1);
+					strcat(buffer, "1");
+					break;
+				case 9:
+					LCD_print("2", huart1);
+					strcat(buffer, "2");
+					break;
+				case 10:
+					LCD_print("3", huart1);
+					strcat(buffer, "3");
+					break;
+				case 11:
+					LCD_print("-", huart1);
+					numbers[k] = atoi(buffer);
+					if (operation == '0') {
+						operation = '-';
+					} else {
+						isError = 1;
+					}
+					k++;
+					memset(buffer, 0, 100);
+					break;
+				case 12: // кнопка сброса
+					LCD_init();
+					LCD_set_cursor(0, 0);
+					memset(buffer, 0, 100);
+					numbers[0] = 0;
+					numbers[1] = 0;
+					k = 0;
+					break;
+				case 13:
+					LCD_print("0", huart1);
+					strcat(buffer, "0");
+					break;
+				case 14: // кнопка "="
+					LCD_init();
+					LCD_set_cursor(0, 0);
+					numbers[k] = atoi(buffer); // переводим и строки в число второй операнд
+					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
+					double answer = 0.0;
+					switch (operation) { // в зависиости от знака операции производим вычисления
+					case '/':
+						if (numbers[1] != 0) {
+							answer = numbers[0] / numbers[1];
+						} else {
+							isError = 1;
+						}
+						break;
+					case 'x':
+						answer = numbers[0] * numbers[1];
+						break;
+					case '-':
+						answer = numbers[0] - numbers[1];
+						break;
+					case '+':
+						answer = numbers[0] + numbers[1];
+						break;
+					case '0':
+						answer = numbers[0];
+						break;
+					}
+					char buf[100];
+					if (isError == 1) { // если была ошибка, то вывести сообщение
+						LCD_print("ERROR", huart1);
+						isError = 0;
+					} else {
+						if (operation == '/') { // если было деление, то выводим дробную часть
+							sprintf(buf, "%.2f", answer);
+						} else {
+							sprintf(buf, "%.0f", answer);
+						}
+						LCD_print(buf, huart1);
+					}
+					numbers[0] = 0; // сброс всех значений
+					numbers[1] = 0;
+					k = 0;
+					needClean = 1;
+					operation = '0';
+					break;
+				case 15:
+					LCD_print("+", huart1);
+					numbers[k] = atoi(buffer);
+					if (operation == '0') {
+						operation = '+';
+					} else {
+						isError = 1;
+					}
+					k++;
+					memset(buffer, 0, 100);
+					break;
+				}
+			}
 		}
-  /* USER CODE END 1 */
+		HAL_Delay(200);
+		/* USER CODE END WHILE */
 
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-  LCD_init_port("D0","E",0); // настройка подключения портов ЖКИ
-   LCD_init_port("D1","E",1);
-   LCD_init_port("D2","E",2);
-   LCD_init_port("D3","E",3);
-   LCD_init_port("D4","E",4);
-   LCD_init_port("D5","E",5);
-   LCD_init_port("D6","E",6);
-   LCD_init_port("D7","E",7);
-   LCD_init_port("RS","E",8);
-   LCD_init_port("E","E",9);
-   LCD_init();
-   LCD_set_cursor(0,0);
-   currentKey = -1;
-   double numbers[2]; // переменная для хранения операндов
-   numbers[0] = 0;
-   numbers[1] = 0;
-   char operation = '0'; // переменная для хранения текущей операции
-   int k = 0; // переменная для указания номера операнда
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  char buffer[100]; // буффер для хранения числа пока вводим цифры
-  int needClean = 0; // переменная определяющая нужно ли очистить экран
-  int isError = 0; // переменная хранения индикатора ошибки
-  while (1)
-  {
-    /* USER CODE END WHILE */
-	  int i;
-	  	  for (i = 0; i < 4; i++) { // в цикле опрашиваем столбцы
-	  		  setVCC(); // подаём 1 на порты столбцов
-	  		  switch (i) { // теперь поочерёдно подаём 0 на каждый столбец
-	  		  	case 0:
-	  		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, 0);
-	  		  	 break;
-	  		  	case 1:
-	  		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, 0);
-	  		  	break;
-	  		  	case 2:
-	  		  		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, 0);
-	  		  	break;
-	  		  	case 3:
-	  		  	 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, 0);
-	  		  	break;
-	  		  }
-	  		  readKey = readRow(); // определяем нажатую клавишу
-	  		  if (readKey != -1) { // если было нажатие
-	  			  currentKey = readKey*4+i; // вычисляем номер нажатой клавиши
-	  			  if (needClean == 1) { // если надо, то чистим экран
-	  				LCD_init();
-	  				LCD_set_cursor(0,0);
-	  				needClean = 0;
-	  			  }
-	  			switch (currentKey) { // в зависимости от номера клавиши по разному обрабатываем
-	  				case 0:
-	  					LCD_print("7",huart1); // выводим на ЖКИ
-	  					strcat(buffer, "7"); // записываем число в буффер, чтобы потом из цифр собрать число
-	  				 break;
-	  				case 1:
-	  					LCD_print("8",huart1);
-	  					strcat(buffer, "8");
-	  				 break;
-	  				 case 2:
-	  					LCD_print("9",huart1);
-	  					strcat(buffer, "9");
-	  				 break;
-	  				 case 3:
-	  					LCD_print("/",huart1);
-	  					numbers[k]=atoi(buffer); // если встретили кнопку с операцией, то записываем первое число
-	  					if (operation == '0') { // и записываем операцию
-	  						operation='/';
-	  					} else { // если два знака операции подряд, то значит ошибка
-	  						isError = 1;
-	  					}
-	  					k++; // переводим указатель операнда на следующий
-	  					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
-	  				 break;
-	  				 case 4:
-	  					LCD_print("4",huart1);
-	  					strcat(buffer, "4");
-	  				  break;
-	  				  case 5:
-	  					LCD_print("5",huart1);
-	  					strcat(buffer, "5");
-	  				  break;
-	  				  case 6:
-	  					LCD_print("6",huart1);
-	  					strcat(buffer, "6");
-	  				  break;
-	  				  case 7:
-	  					LCD_print("x",huart1);
-	  					numbers[k]=atoi(buffer);
-	  					if (operation == '0') {
-	  						operation = 'x';
-	  					} else {
-	  						isError = 1;
-	  					}
-	  					k++;
-	  					memset(buffer, 0, 100);
-	  				  break;
-	  				  case 8:
-	  					LCD_print("1",huart1);
-	  					strcat(buffer, "1");
-	  				  break;
-	  				  case 9:
-	  					LCD_print("2",huart1);
-	  					strcat(buffer, "2");
-	  				  break;
-	  				  case 10:
-	  					LCD_print("3",huart1);
-	  					strcat(buffer, "3");
-	  				  break;
-	  				  case 11:
-	  					LCD_print("-",huart1);
-	  					numbers[k]=atoi(buffer);
-	  					if (operation == '0') {
-	  						operation = '-';
-	  					} else {
-	  						isError = 1;
-	  					}
-	  					k++;
-	  					memset(buffer, 0, 100);
-	  				  break;
-	  				  case 12: // кнопка сброса
-	  					LCD_init();
-	  					LCD_set_cursor(0,0);
-	  					memset(buffer, 0, 100);
-	  					numbers[0] = 0;
-	  					numbers[1] = 0;
-	  					k = 0;
-	  				  break;
-	  				  case 13:
-	  					LCD_print("0",huart1);
-	  					strcat(buffer, "0");
-	  				  break;
-	  				  case 14: // кнопка "="
-	  					LCD_init();
-	  					LCD_set_cursor(0,0);
-	  					numbers[k]=atoi(buffer); // переводим и строки в число второй операнд
-	  					memset(buffer, 0, 100); // обнуляем массив для хранения цифр
-	  					double answer = 0.0;
-	  					switch (operation) { // в зависиости от знака операции производим вычисления
-	  						case '/':
-	  							if (numbers[1] != 0) {
-	  								answer = numbers[0]/numbers[1];
-	  							} else {
-	  								isError = 1;
-	  							}
-	  						break;
-	  						case 'x':
-	  						 answer = numbers[0]*numbers[1];
-	  						break;
-	  						case '-':
-	  						  answer = numbers[0]-numbers[1];
-	  						break;
-	  						case '+':
-	  						  answer = numbers[0]+numbers[1];
-	  						break;
-	  						case '0':
-	  							answer = numbers[0];
-	  						break;
-	  					}
-	  					char buf[100];
-	  					if (isError == 1) {
-	  						LCD_print("ERROR", huart1);
-	  						isError = 0;
-	  					} else {
-	  						if (operation == '/') { // если было деление, то выводим дробную часть
-	  							sprintf(buf, "%.2f", answer);
-	  						} else {
-	  							sprintf(buf, "%.0f", answer);
-	  						}
-	  						LCD_print(buf, huart1);
-	  					}
-	  					numbers[0] = 0; // сброс всех значений
-	  					numbers[1] = 0;
-	  					k = 0;
-	  					needClean = 1;
-	  					operation = '0';
-	  				  break;
-	  				  case 15:
-	  					LCD_print("+",huart1);
-	  					numbers[k]=atoi(buffer);
-	  					if (operation == '0') {
-	  						operation = '+';
-	  					} else {
-	  						isError = 1;
-	  					}
-	  					k++;
-	  					memset(buffer, 0, 100);
-	  				  break;
-	  		  }
-	  	  }
-	  	  }
-	  	  HAL_Delay(200);
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
+	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	/** Configure the main internal regulator output voltage
+	 */
+	__HAL_RCC_PWR_CLK_ENABLE();
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+	/** Initializes the RCC Oscillators according to the specified parameters
+	 * in the RCC_OscInitTypeDef structure.
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		Error_Handler();
+	}
+	/** Initializes the CPU, AHB and APB buses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+		Error_Handler();
+	}
 }
 
 /**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
+ * @brief USART1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART1_UART_Init(void) {
 
-  /* USER CODE BEGIN USART1_Init 0 */
+	/* USER CODE BEGIN USART1_Init 0 */
 
-  /* USER CODE END USART1_Init 0 */
+	/* USER CODE END USART1_Init 0 */
 
-  /* USER CODE BEGIN USART1_Init 1 */
+	/* USER CODE BEGIN USART1_Init 1 */
 
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
+	/* USER CODE END USART1_Init 1 */
+	huart1.Instance = USART1;
+	huart1.Init.BaudRate = 115200;
+	huart1.Init.WordLength = UART_WORDLENGTH_8B;
+	huart1.Init.StopBits = UART_STOPBITS_1;
+	huart1.Init.Parity = UART_PARITY_NONE;
+	huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&huart1) != HAL_OK) {
+		Error_Handler();
+	}
+	/* USER CODE BEGIN USART1_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+	/* USER CODE END USART1_Init 2 */
 
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_2
-                          |GPIO_PIN_5|GPIO_PIN_0|GPIO_PIN_6|GPIO_PIN_8
-                          |GPIO_PIN_7|GPIO_PIN_9, GPIO_PIN_RESET);
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOE,
+			GPIO_PIN_3 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_2 | GPIO_PIN_5
+					| GPIO_PIN_0 | GPIO_PIN_6 | GPIO_PIN_8 | GPIO_PIN_7
+					| GPIO_PIN_9, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_4, GPIO_PIN_RESET);
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_4,
+			GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PE3 PE1 PE4 PE2
-                           PE5 PE0 PE6 PE8
-                           PE7 PE9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_2
-                          |GPIO_PIN_5|GPIO_PIN_0|GPIO_PIN_6|GPIO_PIN_8
-                          |GPIO_PIN_7|GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+	/*Configure GPIO pins : PE3 PE1 PE4 PE2
+	 PE5 PE0 PE6 PE8
+	 PE7 PE9 */
+	GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_2
+			| GPIO_PIN_5 | GPIO_PIN_0 | GPIO_PIN_6 | GPIO_PIN_8 | GPIO_PIN_7
+			| GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD7 PD5 PD6 PD4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_4;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	/*Configure GPIO pins : PD7 PD5 PD6 PD4 */
+	GPIO_InitStruct.Pin = GPIO_PIN_7 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD3 PD1 PD2 PD0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	/*Configure GPIO pins : PD3 PD1 PD2 PD0 */
+	GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 
@@ -435,18 +431,16 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT

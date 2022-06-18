@@ -19,6 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "LCD.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -132,7 +136,6 @@ int main(void) {
 	LCD_init_port("E", "E", 9);
 	LCD_init();
 	LCD_set_cursor(0, 0);
-	char buffer[100];
 	int wasPressed = 0; // переменная определяющая была ли нажата кнопка
 	/* USER CODE END 2 */
 
@@ -174,7 +177,7 @@ int main(void) {
 			case 3:
 				send();
 				LCD_init();
-				HAL_UART_Transmit(&huart1, "/", 1, 100);
+				HAL_UART_Transmit(&huart1, (uint8_t*) "/", 1, 100);
 				break;
 			case 4:
 			case 5:
@@ -184,7 +187,7 @@ int main(void) {
 			case 7:
 				send();
 				LCD_init();
-				HAL_UART_Transmit(&huart1, "x", 1, 100);
+				HAL_UART_Transmit(&huart1, (uint8_t*) "x", 1, 100);
 				break;
 			case 8:
 			case 9:
@@ -194,7 +197,7 @@ int main(void) {
 			case 11:
 				send();
 				LCD_init();
-				HAL_UART_Transmit(&huart1, "-", 1, 100);
+				HAL_UART_Transmit(&huart1, (uint8_t*) "-", 1, 100);
 				break;
 			case 12:
 				accum[currentPos] = *""; // стереть 1 символ из введённого числа
@@ -212,12 +215,12 @@ int main(void) {
 			case 14:
 				send();
 				LCD_init();
-				HAL_UART_Transmit(&huart1, "=", 1, 100);
+				HAL_UART_Transmit(&huart1, (uint8_t*) "=", 1, 100);
 				break;
 			case 15:
 				send();
 				LCD_init();
-				HAL_UART_Transmit(&huart1, "+", 1, 100);
+				HAL_UART_Transmit(&huart1, (uint8_t*) "+", 1, 100);
 				break;
 			}
 			if (isOperation == 0) { // добавить символ к числу

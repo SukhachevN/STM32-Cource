@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stdio.h"
+#include "stdlib.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -114,9 +115,9 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	char buffer[100] = { 0 };
-	HAL_UART_Receive(&huart1, buffer, 1, 100); // очистка буфера UART перед работой
+	HAL_UART_Receive(&huart1, (uint8_t*) buffer, 1, 100); // очистка буфера UART перед работой
 	while (1) {
-		HAL_UART_Receive(&huart1, buffer, 3, HAL_MAX_DELAY); // ожидание с максимальной задержкой числа, проще говоря "зависаем" пока не придёт число
+		HAL_UART_Receive(&huart1, (uint8_t*) buffer, 3, HAL_MAX_DELAY); // ожидание с максимальной задержкой числа, проще говоря "зависаем" пока не придёт число
 		int angle = atoi(buffer); // перевод строки в число
 		setServo(angle); // установить угол
 		/* USER CODE END WHILE */
